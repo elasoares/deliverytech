@@ -32,5 +32,5 @@ Sistema de delivery desenvolvido com Spring Boot e Java 21.
 - Profile: development
 
 ## 👨‍💻 Desenvolvedor
-[Seu Nome] - [Sua Turma]
+[Professora] - [Turma 2602 - Arquitetura de sistema]
 Desenvolvido com JDK 21 e Spring Boot 3.2.x
