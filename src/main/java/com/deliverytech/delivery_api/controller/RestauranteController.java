@@ -37,6 +37,13 @@ public class RestauranteController {
     public Restaurante buscarPorId(@PathVariable Long id){
         return service.buscarPorId(id);
     }
+    
+    @GetMapping("/categoria/{categoria}")
+    public List<Restaurante> buscarPorCategoria(@PathVariable String categoria){
+        return service.buscarPorCategoria(categoria);
+    }
+
+
 
     @DeleteMapping("/{id}")
     public void desativar(@PathVariable Long id){
