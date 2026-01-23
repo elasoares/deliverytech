@@ -1,22 +1,24 @@
 package com.deliverytech.delivery_api.config;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.deliverytech.delivery_api.enums.StatusPedidos;
 import com.deliverytech.delivery_api.model.Cliente;
+import com.deliverytech.delivery_api.model.ItemPedido;
+import com.deliverytech.delivery_api.model.Pedido;
+import com.deliverytech.delivery_api.model.Produto;
 import com.deliverytech.delivery_api.model.Restaurante;
-
 import com.deliverytech.delivery_api.repository.ClienteRepository;
+import com.deliverytech.delivery_api.repository.ItemPedidoRepository;
 import com.deliverytech.delivery_api.repository.PedidoRepository;
 import com.deliverytech.delivery_api.repository.ProdutoRepository;
 import com.deliverytech.delivery_api.repository.RestauranteRepository;
-
-import java.util.Arrays;
-import java.math.BigDecimal;
-
-import com.deliverytech.delivery_api.model.Produto;
-
 
 @Configuration
 public class DataLoader {
@@ -25,7 +27,8 @@ public class DataLoader {
         ClienteRepository clienteRepository,
         RestauranteRepository restauranteRepository,
         ProdutoRepository produtoRepository,
-        PedidoRepository pedidoRepository
+        PedidoRepository pedidoRepository,
+        ItemPedidoRepository itemPedidoRepository
     ){
         return args ->{
             System.out.println("Iniciando carregamento de dados...");
@@ -44,10 +47,10 @@ public class DataLoader {
             cliente2.setEndereco("Avenida Brasil, 456, Rio de Janeiro, RJ");
             cliente2.setAtivo(true);
 
-/*             clienteRepository.save(cliente1);
-            clienteRepository.save(cliente2); */
-
-            clienteRepository.saveAll(Arrays.asList(cliente1, cliente2));
+            List<Cliente> clientes = new ArrayList<>();
+            clientes.add(cliente1);
+            clientes.add(cliente2);
+            clienteRepository.saveAll(clientes);
 
             Restaurante r1 = new Restaurante();
             r1.setNome("Pizza");
@@ -67,7 +70,10 @@ public class DataLoader {
             r1.setTaxaEntrega(new BigDecimal("8.00"));
             r1.setAtivo(true);
 
-            restauranteRepository.saveAll(Arrays.asList(r1, r2));
+            List<Restaurante> restaurantes = new ArrayList<>();
+            restaurantes.add(r1);
+            restaurantes.add(r2);
+            restauranteRepository.saveAll(restaurantes);
 
             Produto p1 = new Produto();
             p1.setNome("Pizza de Calabresa");
@@ -85,9 +91,48 @@ public class DataLoader {
             p2.setDisponivel(true);
             p2.setRestaurante(r2);
 
-            produtoRepository.saveAll(Arrays.asList(p1, p2));
+            List<Produto> produtos = new ArrayList<>();
+            produtos.add(p1);
+            produtos.add(p2);
+            produtoRepository.saveAll(produtos);
+
+            Pedido pedido1 = new Pedido();
+            pedido1.setCliente(cliente1);
+            pedido1.setRestaurante(r1);
+            pedido1.setStatus(StatusPedidos.PENDENTE);
+            pedido1.setEnderecoEntrega(cliente1.getEndereco());
+            pedido1.setValorTotal(BigDecimal.ZERO);
+
+            Pedido pedido2 = new Pedido();
+            pedido2.setCliente(cliente2);
+            pedido2.setRestaurante(r2);
+            pedido2.setStatus(StatusPedidos.PENDENTE);
+            pedido2.setEnderecoEntrega(cliente2.getEndereco());
+            pedido2.setValorTotal(BigDecimal.ZERO);
+
+            pedidoRepository.save(pedido1);
+            pedidoRepository.save(pedido2);
+
+            ItemPedido item1 = new ItemPedido();
+            item1.setProduto(p2);
+            item1.setPedido(pedido2);
+            item1.setQuantidade(2);
+            item1.setPrecoUnitario(p2.getPreco());
+            item1.setSubtotal(p2.getPreco().multiply(BigDecimal.valueOf(item1.getQuantidade())));
             
-        }
+            ItemPedido item2 = new ItemPedido();
+            item2.setProduto(p1);
+            item2.setPedido(pedido1);
+            item2.setPrecoUnitario(p1.getPreco());
+            item2.setQuantidade(5);
+            item2.setSubtotal(p1.getPreco().multiply(BigDecimal.valueOf(item2.getQuantidade())));
+            
+            itemPedidoRepository.save(item1);
+            itemPedidoRepository.save(item2);
+
+            System.out.println("Dados carregados com sucesso!");
+
+        };
     }
     
 }
